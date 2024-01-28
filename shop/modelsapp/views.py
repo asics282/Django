@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from .models import Order, Client, Product
+from .forms import ProductForm
 
 
 class OrderListView(View):
@@ -30,3 +31,14 @@ class OrderListView(View):
 
         orders = Order.objects.all()
         return render(request, self.template_name, {'orders': orders})
+
+
+def create_product(request):
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('order_list')  # пока перенаправление на страницу с списком заказов
+    else:
+        form = ProductForm()
+    return render(request, 'modelsapp/create_product.html', {'form': form})
